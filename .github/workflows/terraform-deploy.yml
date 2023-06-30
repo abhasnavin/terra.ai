@@ -27,14 +27,19 @@ jobs:
           aws-region: "us-west-2"
 
       - name: Terraform init
-        run: terraform init
+        run: |
+          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"root/modules"* 
+            terraform init -detailed-exitcode
+          else
+            echo "No Terraform plan necessary for this directory."
+          fi
 
       - name: Terraform validate
         run: terraform validate
 
       - name: Terraform plan
         run: |
-          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"root/env/dev"* || ${{ github.event_path }} == *"root/env/test"* || ${{ github.event_path }} == *"root/env/prod"*) ]]; then
+          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"root/env/dev"* || ${{ github.event_path }} == *"root/env/test"* || ${{ github.event_path }} == *"root/env/prod"*) ]] && && steps.terraform_init.outputs.exitcode == '0'; then
             terraform plan -detailed-exitcode
           else
             echo "No Terraform plan necessary for this directory."
