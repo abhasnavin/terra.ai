@@ -33,7 +33,11 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# Ignore idea files
-*.xml
+### JetBrains Patch ###
+# Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
+
 *.iml
+modules.xml
+.idea/misc.xml
+*.ipr
 
