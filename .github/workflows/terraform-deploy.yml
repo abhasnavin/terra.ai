@@ -33,8 +33,6 @@ jobs:
     steps:
       - name: Reuse setup
         uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/env/dev
 
       - name: Terraform init (dev)
         run:
@@ -48,8 +46,6 @@ jobs:
     steps:
       - name: Reuse setup
         uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/env/test
 
       - name: Terraform init (test)
         run:
@@ -63,8 +59,6 @@ jobs:
     steps:
       - name: Reuse setup
         uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/env/prod
 
       - name: Terraform init (prod)
         run:
