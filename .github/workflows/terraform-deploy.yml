@@ -29,7 +29,7 @@ jobs:
       - name: Terraform init
         run: |
           if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"env/dev/"* || ${{ github.event_path }} == *"env/test/"* || ${{ github.event_path }} == *"env/prod/"*) ]]; then
-            terraform init -detailed-exitcode
+            terraform init
           else
             echo "No Terraform initialization necessary for this directory."
           fi
