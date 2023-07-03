@@ -35,9 +35,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform init (dev)
-        run:
-          cd ${{ github.workspace }}/env/dev
-          terraform init
+        run:  terraform -chdir="./env/dev" init
 
   init_test:
     needs: setup
