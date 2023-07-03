@@ -9,7 +9,7 @@ on:
       - closed
 
 jobs:
-  init_dev:
+  setup:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,130 +25,102 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-west-2"
+
+  init_dev:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/env/dev
 
       - name: Terraform init (dev)
-        run: |
-          cd ${{ github.workspace }}/env/dev
-          terraform init
+        run: terraform init
 
   init_test:
+    needs: setup
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Reuse setup
         uses: actions/checkout@v2
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "us-west-2"
+          path: ${{ github.workspace }}/env/test
 
       - name: Terraform init (test)
-        run: |
-          cd ${{ github.workspace }}/env/test
-          terraform init
+        run: terraform init
 
   init_prod:
+    needs: setup
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Reuse setup
         uses: actions/checkout@v2
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "us-west-2"
+          path: ${{ github.workspace }}/env/prod
 
       - name: Terraform init (prod)
-        run: |
-          cd ${{ github.workspace }}/env/prod
-          terraform init
+        run: terraform init
 
   validate:
     needs: [init_dev, init_test, init_prod]
     runs-on: ubuntu-latest
 
     steps:
-      - name: Reuse setup and credentials
+      - name: Reuse setup
         uses: actions/checkout@v2
         with:
           path: ${{ github.workspace }}/env
 
       - name: Terraform validate (dev)
-        run: |
-          cd ${{ github.workspace }}/env/dev
-          terraform validate
+        run: terraform validate
 
       - name: Terraform validate (test)
-        run: |
-          cd ${{ github.workspace }}/env/test
-          terraform validate
+        run: terraform validate
 
       - name: Terraform validate (prod)
-        run: |
-          cd ${{ github.workspace }}/env/prod
-          terraform validate
+        run: terraform validate
 
   plan:
     needs: validate
     runs-on: ubuntu-latest
 
     steps:
-      - name: Reuse setup and credentials
+      - name: Reuse setup
         uses: actions/checkout@v2
         with:
           path: ${{ github.workspace }}/env
 
       - name: Terraform plan (dev)
-        run: |
-          cd ${{ github.workspace }}/env/dev
-          terraform plan -detailed-exitcode
+        run: terraform plan -detailed-exitcode
 
       - name: Terraform plan (test)
-        run: |
-          cd ${{ github.workspace }}/env/test
-          terraform plan -detailed-exitcode
+        run: terraform plan -detailed-exitcode
 
       - name: Terraform plan (prod)
-        run: |
-          cd ${{ github.workspace }}/env/prod
-          terraform plan -detailed-exitcode
+        run: terraform plan -detailed-exitcode
 
   apply:
     needs: plan
     runs-on: ubuntu-latest
 
     steps:
-      - name: Reuse setup and credentials
+      - name: Reuse setup
         uses: actions/checkout@v2
         with:
           path: ${{ github.workspace }}/env
 
       - name: Terraform apply (dev)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.dev == '0'
-        run: |
-          cd ${{ github.workspace }}/env/dev
-          terraform apply --auto-approve
+        run: terraform apply --auto-approve
 
       - name: Terraform apply (test)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.test == '0'
-        run: |
-          cd ${{ github.workspace }}/env/test
-          terraform apply --auto-approve
+        run: terraform apply --auto-approve
 
       - name: Terraform apply (prod)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.prod == '0'
-        run: |
-          cd ${{ github.workspace }}/env/prod
-          terraform apply --auto-approve
+        run: terraform apply --auto-approve
