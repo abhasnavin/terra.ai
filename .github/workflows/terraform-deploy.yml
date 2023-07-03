@@ -28,8 +28,8 @@ jobs:
 
       - name: Terraform init
         run: |
-          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"env/dev/"* || ${{ github.event_path }} == *"env/test/"* || ${{ github.event_path }} == *"env/prod/"*) ]]; then
-            terraform init
+          if [[ ${{ github.event_name }} == 'push' ]]; then
+            terraform init -detailed-exitcode
           else
             echo "No Terraform initialization necessary for this directory."
           fi
@@ -59,7 +59,7 @@ jobs:
 
       - name: Terraform plan
         run: |
-          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"env/dev/"* || ${{ github.event_path }} == *"env/test/"* || ${{ github.event_path }} == *"env/prod/"*) ]] && [[ steps.init.outputs.exitcode == '0' ]]; then
+          if [[ ${{ github.event_name }} == 'push' ]] && [[ steps.init.outputs.exitcode == '0' ]]; then
             terraform plan -detailed-exitcode
           else
             echo "No Terraform plan necessary for this directory."
