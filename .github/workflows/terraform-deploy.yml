@@ -30,13 +30,13 @@ jobs:
         run: |
           if [[ ${{ github.event_name }} == 'push' ]]; then
             cd ${{ github.workspace }}/env/dev
-            terraform init -detailed-exitcode
+            terraform init 
 
             cd ${{ github.workspace }}/env/test
-            terraform init -detailed-exitcode
+            terraform init 
 
             cd ${{ github.workspace }}/env/prod
-            terraform init -detailed-exitcode
+            terraform init 
           else
             echo "No Terraform initialization necessary for this directory."
           fi
