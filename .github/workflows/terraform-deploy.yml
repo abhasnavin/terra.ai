@@ -9,7 +9,7 @@ on:
       - closed
 
 jobs:
-  deploy:
+  init:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,23 +28,53 @@ jobs:
 
       - name: Terraform init
         run: |
-          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"root/modules"*) ]]; then
+          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"env/dev/"* || ${{ github.event_path }} == *"env/test/"* || ${{ github.event_path }} == *"env/prod/"*) ]]; then
             terraform init -detailed-exitcode
           else
             echo "No Terraform initialization necessary for this directory."
           fi
 
+  validate:
+    needs: init
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup and credentials
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/env
+
       - name: Terraform validate
         run: terraform validate
 
+  plan:
+    needs: init
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup and credentials
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/env
+
       - name: Terraform plan
         run: |
-          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"root/env/dev"* || ${{ github.event_path }} == *"root/env/test"* || ${{ github.event_path }} == *"root/env/prod"*) ]] && [[ steps.terraform_init.outputs.exitcode == '0' ]]; then
+          if [[ ${{ github.event_name }} == 'push' && (${{ github.event_path }} == *"env/dev/"* || ${{ github.event_path }} == *"env/test/"* || ${{ github.event_path }} == *"env/prod/"*) ]] && [[ steps.init.outputs.exitcode == '0' ]]; then
             terraform plan -detailed-exitcode
           else
             echo "No Terraform plan necessary for this directory."
           fi
 
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup and credentials
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/env
+
       - name: Terraform apply
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && steps.terraform_plan.outputs.exitcode == '0'
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && steps.plan.outputs.exitcode == '0'
         run: terraform apply --auto-approve
