@@ -29,6 +29,13 @@ jobs:
       - name: Terraform init
         run: |
           if [[ ${{ github.event_name }} == 'push' ]]; then
+            cd ${{ github.workspace }}/env/dev
+            terraform init -detailed-exitcode
+
+            cd ${{ github.workspace }}/env/test
+            terraform init -detailed-exitcode
+
+            cd ${{ github.workspace }}/env/prod
             terraform init -detailed-exitcode
           else
             echo "No Terraform initialization necessary for this directory."
@@ -42,10 +49,18 @@ jobs:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-          path: ${{ github.workspace }}/env
+            path: ${{ github.workspace }}/env
 
       - name: Terraform validate
-        run: terraform validate
+        run: |
+          cd ${{ github.workspace }}/env/dev
+          terraform validate
+
+          cd ${{ github.workspace }}/env/test
+          terraform validate
+
+          cd ${{ github.workspace }}/env/prod
+          terraform validate
 
   plan:
     needs: init
@@ -55,11 +70,18 @@ jobs:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-          path: ${{ github.workspace }}/env
+            path: ${{ github.workspace }}/env
 
       - name: Terraform plan
         run: |
-          if [[ ${{ github.event_name }} == 'push' ]] && [[ steps.init.outputs.exitcode == '0' ]]; then
+          if [[ ${{ github.event_name }} == 'push' ]]; then
+            cd ${{ github.workspace }}/env/dev
+            terraform plan -detailed-exitcode
+
+            cd ${{ github.workspace }}/env/test
+            terraform plan -detailed-exitcode
+
+            cd ${{ github.workspace }}/env/prod
             terraform plan -detailed-exitcode
           else
             echo "No Terraform plan necessary for this directory."
@@ -73,8 +95,16 @@ jobs:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-          path: ${{ github.workspace }}/env
+            path: ${{ github.workspace }}/env
 
       - name: Terraform apply
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && steps.plan.outputs.exitcode == '0'
-        run: terraform apply --auto-approve
+        run: |
+          cd ${{ github.workspace }}/env/dev
+          terraform apply --auto-approve
+
+          cd ${{ github.workspace }}/env/test
+          terraform apply --auto-approve
+
+          cd ${{ github.workspace }}/env/prod
+          terraform apply --auto-approve
