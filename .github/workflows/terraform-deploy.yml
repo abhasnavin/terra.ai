@@ -37,7 +37,9 @@ jobs:
           path: ${{ github.workspace }}/env/dev
 
       - name: Terraform init (dev)
-        run: terraform init
+        run:
+          cd ${{ github.workspace }}/env/dev
+          terraform init
 
   init_test:
     needs: setup
@@ -50,7 +52,9 @@ jobs:
           path: ${{ github.workspace }}/env/test
 
       - name: Terraform init (test)
-        run: terraform init
+        run:
+          cd ${{ github.workspace }}/env/dev
+          terraform init
 
   init_prod:
     needs: setup
@@ -63,7 +67,9 @@ jobs:
           path: ${{ github.workspace }}/env/prod
 
       - name: Terraform init (prod)
-        run: terraform init
+        run:
+          cd ${{ github.workspace }}/env/prod
+          terraform init
 
   validate:
     needs: [init_dev, init_test, init_prod]
@@ -91,17 +97,21 @@ jobs:
     steps:
       - name: Reuse setup
         uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/env
 
       - name: Terraform plan (dev)
-        run: terraform plan -detailed-exitcode
+        run:
+          cd ${{ github.workspace }}/env/dev
+          terraform plan -detailed-exitcode
 
       - name: Terraform plan (test)
-        run: terraform plan -detailed-exitcode
+        run:
+          cd ${{ github.workspace }}/env/test
+          terraform plan -detailed-exitcode
 
       - name: Terraform plan (prod)
-        run: terraform plan -detailed-exitcode
+        run:
+          cd ${{ github.workspace }}/env/prod
+          terraform plan -detailed-exitcode
 
   apply:
     needs: plan
@@ -115,12 +125,18 @@ jobs:
 
       - name: Terraform apply (dev)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.dev == '0'
-        run: terraform apply --auto-approve
+        run:
+          cd ${{ github.workspace }}/env/dev
+          terraform apply --auto-approve
 
       - name: Terraform apply (test)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.test == '0'
-        run: terraform apply --auto-approve
+        run:
+          cd ${{ github.workspace }}/env/test
+          terraform apply --auto-approve
 
       - name: Terraform apply (prod)
         if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.prod == '0'
-        run: terraform apply --auto-approve
+        run:
+          cd ${{ github.workspace }}/env/prod
+          terraform apply --auto-approve
