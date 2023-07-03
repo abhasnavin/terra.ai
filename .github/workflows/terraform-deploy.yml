@@ -9,7 +9,7 @@ on:
       - closed
 
 jobs:
-  init:
+  init_dev:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,66 +26,104 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-west-2"
 
-      - name: Terraform init
+      - name: Terraform init (dev)
         run: |
-          if [[ ${{ github.event_name }} == 'push' ]]; then
-            cd ${{ github.workspace }}/env/dev
-            terraform init 
+          cd ${{ github.workspace }}/env/dev
+          terraform init
 
-            cd ${{ github.workspace }}/env/test
-            terraform init 
+  init_test:
+    runs-on: ubuntu-latest
 
-            cd ${{ github.workspace }}/env/prod
-            terraform init 
-          else
-            echo "No Terraform initialization necessary for this directory."
-          fi
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-west-2"
+
+      - name: Terraform init (test)
+        run: |
+          cd ${{ github.workspace }}/env/test
+          terraform init
+
+  init_prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-west-2"
+
+      - name: Terraform init (prod)
+        run: |
+          cd ${{ github.workspace }}/env/prod
+          terraform init
 
   validate:
-    needs: init
+    needs: [init_dev, init_test, init_prod]
     runs-on: ubuntu-latest
 
     steps:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-            path: ${{ github.workspace }}/env
+          path: ${{ github.workspace }}/env
 
-      - name: Terraform validate
+      - name: Terraform validate (dev)
         run: |
           cd ${{ github.workspace }}/env/dev
           terraform validate
 
+      - name: Terraform validate (test)
+        run: |
           cd ${{ github.workspace }}/env/test
           terraform validate
 
+      - name: Terraform validate (prod)
+        run: |
           cd ${{ github.workspace }}/env/prod
           terraform validate
 
   plan:
-    needs: init
+    needs: validate
     runs-on: ubuntu-latest
 
     steps:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-            path: ${{ github.workspace }}/env
+          path: ${{ github.workspace }}/env
 
-      - name: Terraform plan
+      - name: Terraform plan (dev)
         run: |
-          if [[ ${{ github.event_name }} == 'push' ]]; then
-            cd ${{ github.workspace }}/env/dev
-            terraform plan -detailed-exitcode
+          cd ${{ github.workspace }}/env/dev
+          terraform plan -detailed-exitcode
 
-            cd ${{ github.workspace }}/env/test
-            terraform plan -detailed-exitcode
+      - name: Terraform plan (test)
+        run: |
+          cd ${{ github.workspace }}/env/test
+          terraform plan -detailed-exitcode
 
-            cd ${{ github.workspace }}/env/prod
-            terraform plan -detailed-exitcode
-          else
-            echo "No Terraform plan necessary for this directory."
-          fi
+      - name: Terraform plan (prod)
+        run: |
+          cd ${{ github.workspace }}/env/prod
+          terraform plan -detailed-exitcode
 
   apply:
     needs: plan
@@ -95,16 +133,22 @@ jobs:
       - name: Reuse setup and credentials
         uses: actions/checkout@v2
         with:
-            path: ${{ github.workspace }}/env
+          path: ${{ github.workspace }}/env
 
-      - name: Terraform apply
-        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && steps.plan.outputs.exitcode == '0'
+      - name: Terraform apply (dev)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.dev == '0'
         run: |
           cd ${{ github.workspace }}/env/dev
           terraform apply --auto-approve
 
+      - name: Terraform apply (test)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.test == '0'
+        run: |
           cd ${{ github.workspace }}/env/test
           terraform apply --auto-approve
 
+      - name: Terraform apply (prod)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.prod == '0'
+        run: |
           cd ${{ github.workspace }}/env/prod
           terraform apply --auto-approve
