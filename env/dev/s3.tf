@@ -1,5 +1,5 @@
 module "s3_bucket" {
-  source = "../../module/s3"
+  source = "../../modules/s3"
 
   enable_s3_bucket      = true
   enable_s3_bucket_acl  = true
