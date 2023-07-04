@@ -6,6 +6,11 @@ terraform {
       version = ">= 3.0, < 4.0"
     }
   }
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "terraAI"
+    workspaces { prefix = "test-" }
+  }
 }
 #
 #provider "aws" {
