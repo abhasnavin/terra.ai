@@ -35,7 +35,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform init (dev)
-        if: success() || failure()
         run:  terraform -chdir="./env/dev" init
 
   init_test:
@@ -47,7 +46,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform init (test)
-        if: success() || failure()
         run:  terraform -chdir="./env/test" init
 
   init_prod:
@@ -59,7 +57,6 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform init (prod)
-        if: success() || failure()
         run:  terraform -chdir="./env/prod" init
 
   validate:
@@ -71,15 +68,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform validate (dev)
-        if: success() || failure()
         run: terraform -chdir="./env/prod" validate
 
       - name: Terraform validate (test)
-        if: success() || failure()
         run: terraform -chdir="./env/test" validate
 
       - name: Terraform validate (prod)
-        if: success() || failure()
         run: terraform -chdir="./env/prod" validate
 
   plan:
