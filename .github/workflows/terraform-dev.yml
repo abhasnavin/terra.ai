@@ -36,7 +36,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
-          export TF_WORKSPACE="dev"
+          export TF_WORKSPACE="ai-dev"
           terraform -chdir="./env/dev" init -input=false
           terraform workspace show
 
@@ -44,7 +44,7 @@ jobs:
         id: plan
         if: github.event_name == 'pull_request'
         run: |
-          export TF_WORKSPACE="dev"
+          export TF_WORKSPACE="ai-dev"
           terraform -chdir="./env/dev" plan -input=false -no-color
         continue-on-error: true
 
@@ -82,6 +82,6 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         run: |
-          export TF_WORKSPACE="dev"
+          export TF_WORKSPACE="ai-dev"
           terraform -chdir="./env/dev" apply -auto-approve  
 
