@@ -59,8 +59,9 @@ jobs:
       - name: Terraform init (prod)
         run:  terraform -chdir="./env/prod" init
 
-  validate:
-    needs: [init_dev, init_test, init_prod]
+  validate_dev:
+    needs: init_dev
+    if: success() || failure()
     runs-on: ubuntu-latest
 
     steps:
@@ -68,16 +69,34 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform validate (dev)
-        run: terraform -chdir="./env/prod" validate
+        run: terraform -chdir="./env/dev" validate
+
+  validate_test:
+    needs: init_test
+    if: success() || failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
 
       - name: Terraform validate (test)
         run: terraform -chdir="./env/test" validate
+
+  validate_prod:
+    needs: init_prod
+    if: success() || failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
 
       - name: Terraform validate (prod)
         run: terraform -chdir="./env/prod" validate
 
   plan:
-    needs: validate
+    needs: [validate_dev,validate_test,validate_prod]
     runs-on: ubuntu-latest
 
     steps:
