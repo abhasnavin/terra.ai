@@ -69,19 +69,21 @@ jobs:
     steps:
       - name: Reuse setup
         uses: actions/checkout@v2
-        with:
-          path: ${{ github.workspace }}/env
 
       - name: Terraform validate (dev)
-        run: terraform validate
+        if: success() || failure()
+        run: terraform -chdir="./env/prod" validate
 
       - name: Terraform validate (test)
-        run: terraform validate
+        if: success() || failure()
+        run: terraform -chdir="./env/test" validate
 
       - name: Terraform validate (prod)
-        run: terraform validate
+        if: success() || failure()
+        run: terraform -chdir="./env/prod" validate
 
   plan:
+    needs: validate
     runs-on: ubuntu-latest
 
     steps:
@@ -89,6 +91,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Terraform plan (dev)
+
         run:  terraform -chdir="./env/dev" plan
 
       - name: Terraform plan (test)
