@@ -12,6 +12,8 @@ jobs:
   terraform:
     name: "Deploy-Development-Environment"
     runs-on: ubuntu-latest
+    env:
+      PLAN: ${{ steps.plan.outputs.stdout }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -43,32 +45,23 @@ jobs:
         id: plan
         if: github.event_name == 'push'
         run: |
-          echo "::set-output name=plan::$(terraform -chdir='./env/dev' plan -input=false -no-color)"
+          terraform -chdir="./env/dev" plan -input=false -no-color
+        continue-on-error: true
 
-      - uses: actions/github-script@0.9.0
+      - name: Comment on push
         if: github.event_name == 'push'
-        env:
-          PLAN: ${{ steps.plan.outputs.plan }}
         run: |
-          const output = `#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}
-          #### Terraform Initialization ⚙️${{ steps.init.outcome }}
-          #### Terraform Plan 📖${{ steps.plan.outcome }}
-    
-          <details><summary>Show Plan</summary>
-    
-          \`\`\`${process.env.PLAN}\`\`\`
-    
-          </details>
-    
-          *Pusher : @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-                   
-                   github.issues.createComment({
-                   issue_number: context.issue.number,
-                   owner: context.repo.owner,
-                   repo: context.repo.repo,
-                   body: output
-                 })
-                   
+          echo "#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}"
+          echo "#### Terraform Initialization ⚙️${{ steps.init.outcome }}"
+          echo "#### Terraform Plan 📖${{ steps.plan.outcome }}"
+          echo "<details><summary>Show Plan</summary>"
+          echo "\`\`\`"
+          echo "${{ steps.plan.outputs.stdout }}"
+          echo "\`\`\`"
+          echo "</details>"
+          echo "*Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*" > comment.txt
+
+          gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
