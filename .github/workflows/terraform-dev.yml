@@ -37,7 +37,7 @@ jobs:
         id: init
         run: |
           terraform -chdir="./env/dev" init -input=false
-          terraform workspace show
+          terraform workspace select dev
 
       - name: Terraform Plan
         id: plan
