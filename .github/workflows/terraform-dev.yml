@@ -43,27 +43,32 @@ jobs:
         id: plan
         if: github.event_name == 'push'
         run: |
-          terraform -chdir="./env/dev" plan -input=false -no-color
-        continue-on-error: true
+          echo "::set-output name=plan::$(terraform -chdir='./env/dev' plan -input=false -no-color)"
 
-      - name: Comment on push
+      - uses: actions/github-script@0.9.0
         if: github.event_name == 'push'
         env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+          PLAN: ${{ steps.plan.outputs.plan }}
         run: |
-          echo "::set-env name=PLAN::$(terraform -chdir='./env/dev' plan -input=false -no-color)"
-          node -e "
-          const output = '#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}\n' +
-          '#### Terraform Initialization ⚙️${{ steps.init.outcome }}\n' +
-          '#### Terraform Plan 📖${{ steps.plan.outcome }}\n' +
-          '<details><summary>Show Plan</summary>\n' +
-          '```\n' +
-          process.env.PLAN +
-          '\n```\n' +
-          '</details>\n' +
-          '*Pusher: @${{ github.actor }}, Action: `${{ github.event_name }}`*';"
-
-          gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
+          const output = `#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}
+          #### Terraform Initialization ⚙️${{ steps.init.outcome }}
+          #### Terraform Plan 📖${{ steps.plan.outcome }}
+    
+          <details><summary>Show Plan</summary>
+    
+          \`\`\`${process.env.PLAN}\`\`\`
+    
+          </details>
+    
+          *Pusher : @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+                   
+                   github.issues.createComment({
+                   issue_number: context.issue.number,
+                   owner: context.repo.owner,
+                   repo: context.repo.repo,
+                   body: output
+                 })
+                   
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
