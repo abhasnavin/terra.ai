@@ -56,7 +56,7 @@ jobs:
           echo "#### Terraform Plan 📖${{ steps.plan.outcome }}"
           echo "<details><summary>Show Plan</summary>"
           echo "\`\`\`"
-          echo "${{ steps.plan.outputs.stdout }}"
+          echo "${{ env.PLAN }}"
           echo "\`\`\`"
           echo "</details>"
           echo "*Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*" > comment.txt
