@@ -51,9 +51,9 @@ jobs:
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         run: |
-          `#### Terraform Format and Style 🖌`${{ steps.fmt.outcome }}`
-          `#### Terraform Initialization ⚙️`${{ steps.init.outcome }}`
-          `#### Terraform Plan 📖`${{ steps.plan.outcome }}`
+          #### Terraform Format and Style 🖌`${{ steps.fmt.outcome }}`
+          #### Terraform Initialization ⚙️`${{ steps.init.outcome }}`
+          #### Terraform Plan 📖`${{ steps.plan.outcome }}`
           
           <details><summary>Show Plan</summary>
           
