@@ -1,0 +1,142 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-west-2"
+
+  init_dev:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform init (dev)
+        run:  terraform -chdir="./env/dev" init
+
+  init_test:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform init (test)
+        run:  terraform -chdir="./env/test" init
+
+  init_prod:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform init (prod)
+        run:  terraform -chdir="./env/prod" init
+
+  validate_dev:
+    needs: init_dev
+    if: success() || failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform validate (dev)
+        run: terraform -chdir="./env/dev" validate
+
+  validate_test:
+    needs: init_test
+    if: success() || failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform validate (test)
+        run: terraform -chdir="./env/test" validate
+
+  validate_prod:
+    needs: init_prod
+    if: success() || failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform validate (prod)
+        run: terraform -chdir="./env/prod" validate
+
+  plan:
+    needs: [validate_dev,validate_test,validate_prod]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+
+      - name: Terraform plan (dev)
+
+        run:  terraform -chdir="./env/dev" plan
+
+      - name: Terraform plan (test)
+        run:  terraform -chdir="./env/test" plan
+
+      - name: Terraform plan (prod)
+        run:  terraform -chdir="./env/prod" plan
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Reuse setup
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.workspace }}/env
+
+      - name: Terraform apply (dev)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.dev == '0'
+        run:
+          cd ${{ github.workspace }}/env/dev
+          terraform apply --auto-approve
+
+      - name: Terraform apply (test)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.test == '0'
+        run:
+          cd ${{ github.workspace }}/env/test
+          terraform apply --auto-approve
+
+      - name: Terraform apply (prod)
+        if: github.event_name == 'pull_request' && github.event.pull_request.merged == true && needs.plan.outputs.prod == '0'
+        run:
+          cd ${{ github.workspace }}/env/prod
+          terraform apply --auto-approve

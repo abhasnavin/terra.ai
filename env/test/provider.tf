@@ -9,7 +9,7 @@ terraform {
   #  backend "remote" {
   #    hostname     = "app.terraform.io"
   #    organization = "terraAI"
-  #    workspaces { name = "ai-dev" }
+  #    workspaces { name = "ai-test" }
   #  }
 }
 #

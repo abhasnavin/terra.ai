@@ -1,14 +1,15 @@
 #---------------------------------------------------
 # AWS S3 bucket acl
 #---------------------------------------------------
+//noinspection ConflictingProperties
 resource "aws_s3_bucket_acl" "s3_bucket_acl" {
   count = var.enable_s3_bucket_acl ? 1 : 0
 
   bucket = var.s3_bucket_acl_bucket != "" && !var.enable_s3_bucket ? var.s3_bucket_acl_bucket : element(concat(aws_s3_bucket.s3_bucket.*.id, [""]), 0)
 
   acl                   = var.s3_bucket_acl_acl
-  expected_bucket_owner = var.s3_bucket_acl_expected_bucket_owner
 
+  //noinspection ConflictingProperties
   dynamic "access_control_policy" {
     iterator = access_control_policy
     for_each = var.s3_bucket_acl_access_control_policy
