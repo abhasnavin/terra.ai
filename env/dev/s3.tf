@@ -12,7 +12,7 @@ module "s3_bucket" {
   s3_bucket_acl_expected_bucket_owner = ""
   s3_bucket_acl_access_control_policy = {}
   tags = {
-    env  = "dev"
+    env  = "dev1"
     type = "storage"
   }
 }
