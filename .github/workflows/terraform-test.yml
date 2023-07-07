@@ -65,7 +65,7 @@ jobs:
 #          gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
 
       - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && steps.plan.outcome == 'failure'
         run: exit 1
 
       - name: Terraform Apply

@@ -12,7 +12,7 @@ terraform {
   #    workspaces { name = "ai-test" }
   #  }
 }
-#
+
 #provider "aws" {
 #  version = ">= 3.0, < 4.0"  # Specify the AWS provider version constraint
 #  region  = "us-west-2"      # Update with your desired AWS region
