@@ -39,3 +39,4 @@ terraform.rc
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/terra.ai.iml
 /.idea/vcs.xml
+/env/dev/.terraform.lock.hcl
