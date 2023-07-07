@@ -13,6 +13,6 @@ module "s3_bucket" {
   s3_bucket_acl_access_control_policy = {}
   tags = {
     env  = "dev"
-    name = "dev_s3_bucket!"
+    type = "storage"
   }
 }
