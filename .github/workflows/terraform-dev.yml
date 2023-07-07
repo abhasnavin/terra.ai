@@ -5,8 +5,10 @@ on:
     branches:
       - develop
   push:
-    branches:
-      - feature/dev-*
+    paths:
+      - 'env/dev/**.tf'
+#    branches:
+#      - feature/dev-*
 
 jobs:
   terraform:

@@ -5,8 +5,10 @@ on:
     branches:
       - test
   push:
-    branches:
-      - feature/test-*
+    paths:
+      - 'env/test/**.tf'
+#    branches:
+#      - feature/test-*
 
 jobs:
   terraform:
