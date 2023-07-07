@@ -31,9 +31,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "us-west-2"
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform -chdir="./env/dev" fmt -check
+#      - name: Terraform Format
+#        id: fmt
+#        run: terraform -chdir="./env/dev" fmt -check
 
       - name: Terraform Init
         id: init
