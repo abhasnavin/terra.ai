@@ -12,7 +12,7 @@ on:
 
 jobs:
   terraform:
-    name: "Deploy-Development-Environment"
+    name: "Deploy-Production-Environment"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          # terraform_version: 1.5.2:
+#           terraform_version: 1.5.2:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Configure AWS credentials
@@ -38,14 +38,14 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
-          terraform -chdir="./env/dev" init -input=false
+          terraform -chdir="./env/prod" init -input=false
 #          terraform workspace select dev
 
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'push'
         run: |
-          terraform -chdir="./env/dev" plan -input=false -no-color
+          terraform -chdir="./env/prod" plan -input=false -no-color
 #        continue-on-error: true
 #
 #      - name: Comment on push
@@ -70,4 +70,4 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request' && github.event.pull_request.merged == true
-        run: terraform -chdir="./env/dev" apply -auto-approve
+        run: terraform -chdir="./env/prod" apply -auto-approve
