@@ -3,7 +3,7 @@ name: "Terraform-Develop"
 on:
   pull_request:
     branches:
-      - develop
+      - main
   push:
     paths:
       - 'env/dev/**.tf'

@@ -11,11 +11,6 @@ terraform {
     organization = "terraAI"
     workspaces { name = "ai-dev" }
   }
-  #  backend "s3" {
-  #    bucket = "glue-terraform-backend"
-  #    key    = "terraform.tfstate"
-  #    region = "ap-southeast-2"
-  #  }
 }
 
 provider "aws" {
