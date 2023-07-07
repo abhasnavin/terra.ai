@@ -72,3 +72,21 @@ variable "s3_bucket_acl_access_control_policy" {
   description = "(Optional, Conflicts with acl) A configuration block that sets the ACL permissions for an object per grantee"
   default     = []
 }
+
+#---------------------------------------------------
+# AWS S3 bucket ownership controls
+#---------------------------------------------------
+variable "enable_s3_bucket_ownership_controls" {
+  description = "Enable s3 bucket ownership controls usage"
+  default     = false
+}
+
+variable "s3_bucket_ownership_controls_bucket" {
+  description = "The name of the bucket that you want to associate this access point with."
+  default     = ""
+}
+
+variable "s3_bucket_ownership_controls_rule" {
+  description = "(Required) Configuration block(s) with Ownership Controls rules."
+  default     = []
+}
