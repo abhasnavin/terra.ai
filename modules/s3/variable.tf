@@ -1,65 +1,74 @@
-variable "enable_s3_bucket" {
-  description = "Enable creation of S3 bucket"
-  type        = bool
-  default     = true
+#-----------------------------------------------------------
+# Global or/and default variables
+#-----------------------------------------------------------
+variable "name" {
+  description = "Name to be used on all resources as prefix"
+  default     = "TEST"
 }
 
-variable "enable_s3_bucket_acl" {
-  description = "Enable creation of S3 bucket ACL"
-  type        = bool
-  default     = true
+variable "environment" {
+  description = "Environment for service"
+  default     = "STAGE"
+}
+
+variable "tags" {
+  description = "A list of tag blocks. Each element should have keys named key, value, etc."
+  type        = map(string)
+  default     = {}
+}
+
+#-----------------------------------------------------------
+# S3 bucket
+#-----------------------------------------------------------
+variable "enable_s3_bucket" {
+  description = "Enable to create S3 bucket by default"
+  default     = false
 }
 
 variable "s3_bucket_name" {
-  description = "Name of the S3 bucket"
-  type        = string
+  description = "Name for bucket name. Conflicts with s3_bucket_prefix."
   default     = null
 }
 
 variable "s3_bucket_prefix" {
-  description = "Prefix for the S3 bucket"
-  type        = string
+  description = "Creates a unique bucket name beginning with the specified prefix. Conflicts with s3_bucket_name."
   default     = null
 }
 
 variable "s3_bucket_force_destroy" {
-  description = "Set to true to enable force destroy of the S3 bucket"
-  type        = bool
-  default     = false
+  description = "(Optional) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
+  default     = null
 }
 
 variable "s3_bucket_object_lock_enabled" {
-  description = "Set to true to enable object lock for the S3 bucket"
-  type        = bool
+  description = "(Optional, Default:false, Forces new resource) Indicates whether this bucket has an Object Lock configuration enabled."
+  default     = null
+}
+
+#---------------------------------------------------
+# AWS S3 bucket acl
+#---------------------------------------------------
+variable "enable_s3_bucket_acl" {
+  description = "Enable s3 bucket acl usage"
   default     = false
 }
 
 variable "s3_bucket_acl_bucket" {
-  description = "The name of the S3 bucket to associate the ACL with"
-  type        = string
+  description = "The name of the bucket"
   default     = ""
-}
-
-variable "s3_bucket_acl_acl" {
-  description = "The canned ACL to apply. Must be one of private, public-read, public-read-write, authenticated-read, log-delivery-write, bucket-owner-read, bucket-owner-full-control"
-  type        = string
-  default     = "private"
 }
 
 variable "s3_bucket_acl_expected_bucket_owner" {
-  description = "The expected owner of the bucket"
-  type        = string
-  default     = ""
+  description = "(Optional, Forces new resource) The account ID of the expected bucket owner."
+  default     = null
+}
+
+variable "s3_bucket_acl_acl" {
+  description = "(Optional, Conflicts with access_control_policy) The canned ACL to apply to the bucket."
+  default     = null
 }
 
 variable "s3_bucket_acl_access_control_policy" {
-  description = "A map representing the access control policy of the bucket"
-  type        = map(any)
-  default     = {}
-}
-
-variable "tags" {
-  description = "Additional tags for the resources"
-  type        = map(string)
-  default     = {}
+  description = "(Optional, Conflicts with acl) A configuration block that sets the ACL permissions for an object per grantee"
+  default     = []
 }
