@@ -3,7 +3,7 @@ module "s3_bucket" {
 
   enable_s3_bucket                    = true
   enable_s3_bucket_acl                = true
-  s3_bucket_name                      = "test_s3_bucket"
+  s3_bucket_name                      = "test-s3-bucket"
   s3_bucket_prefix                    = null
   s3_bucket_force_destroy             = false
   s3_bucket_object_lock_enabled       = false
