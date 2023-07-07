@@ -44,23 +44,23 @@ jobs:
         if: github.event_name == 'push'
         run: |
           terraform -chdir="./env/dev" plan -input=false -no-color
-        continue-on-error: true
-
-      - name: Comment on push
-        if: github.event_name == 'push'
-        env:
-          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-        run: |
-          echo "#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}"
-          echo "#### Terraform Initialization ⚙️${{ steps.init.outcome }}"
-          echo "#### Terraform Plan 📖${{ steps.plan.outcome }}"
-          echo "<details><summary>Show Plan</summary>"
-          echo "```"
-          echo "${{ env.PLAN }}"
-          echo "```"
-          echo "</details>"
-          echo "*Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*" > comment.txt
-          gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
+#        continue-on-error: true
+#
+#      - name: Comment on push
+#        if: github.event_name == 'push'
+#        env:
+#          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+#        run: |
+#          echo "#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}"
+#          echo "#### Terraform Initialization ⚙️${{ steps.init.outcome }}"
+#          echo "#### Terraform Plan 📖${{ steps.plan.outcome }}"
+#          echo "<details><summary>Show Plan</summary>"
+#          echo "```"
+#          echo "${{ env.PLAN }}"
+#          echo "```"
+#          echo "</details>"
+#          echo "*Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*" > comment.txt
+#          gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
