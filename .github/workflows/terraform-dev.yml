@@ -12,8 +12,6 @@ jobs:
   terraform:
     name: "Deploy-Development-Environment"
     runs-on: ubuntu-latest
-    env:
-      PLAN: ${{ steps.plan.outputs.stdout }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -50,17 +48,18 @@ jobs:
 
       - name: Comment on push
         if: github.event_name == 'push'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         run: |
-          echo "#### Terraform Format and Style 🖌${{ steps.fmt.outcome }}"
-          echo "#### Terraform Initialization ⚙️${{ steps.init.outcome }}"
-          echo "#### Terraform Plan 📖${{ steps.plan.outcome }}"
-          echo "<details><summary>Show Plan</summary>"
-          echo "\`\`\`"
-          echo "${{ env.PLAN }}"
-          echo "\`\`\`"
-          echo "</details>"
-          echo "*Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*" > comment.txt
-
+          const output = '#### Terraform Format and Style 🖌`${{ steps.fmt.outcome }}`
+          #### Terraform Initialization ⚙️`${{ steps.init.outcome }}`
+          #### Terraform Plan 📖`${{ steps.plan.outcome }}`
+          
+          <details><summary>Show Plan</summary>
+          
+          ```' + process.env.PLAN + '```' + '</details>
+          
+          *Pusher: @' + github.actor + ', Action: `' + github.event_name + '`*';
           gh issue comment ${{ github.event.issue.number }} --body "$(cat comment.txt)"
 
       - name: Terraform Plan Status
