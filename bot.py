@@ -1,13 +1,9 @@
 import streamlit as st
 import os
-import time
-import git
-import datetime
 import openai
-import re
 
-openai.api_key = "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"
-repo_name ='https://github.com/rahulgoyal01/terra.ai'
+openai.api_key = "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"
+repo_name = "https://github.com/rahulgoyal01/terra.ai"
 
 # Set the model to use for generating responses
 model = "gpt-3.5-turbo"
@@ -21,27 +17,29 @@ def load_files_from_local(folder_path):
             file_path = os.path.join(folder_path, file_name)
             with open(file_path, 'r') as file:
                 file_contents[file_name] = file.read()
-    
-    # print(file_contents)
-    # print("+++++==================+++++")
 
     return file_contents
 
 
-# Function to process user input based on loaded file contents and generate the chatbot response
 # Function to process user input based on loaded file contents and generate the chatbot response
 def get_chatbot_response(user_input, file_contents):
     # Concatenate all file contents into a single string for context
     context = " ".join(file_contents.values())
 
     # Use the OpenAI API to generate the chatbot response
-    response = openai.Completion.create(
-        model=model,  # Choose the appropri ate GPT-3 engine
-        prompt=context + " " + user_input,
-        max_tokens=4000
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": "You are a Terraform Developer.  \
+                                          You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                                          You will use this code as an input to generate module blocks for the resources to deploy. \
+                                          Just reply with the module block code only and nothing else.\
+                                          The output module block must have correct value like variable names and default values"},
+            {"role": "user", "content": context + " " + user_input},
+        ],
     )
 
-    return "Chatbot says: " + response['choices'][0]['text'].strip()
+    return "Chatbot says: \n"+ response['choices'][0]['message']['content'].strip()
 
 
 def main():
