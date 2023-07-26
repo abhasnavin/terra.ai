@@ -65,15 +65,16 @@ def main():
 
     while True:
         user_input = st.text_area(f"User Input - Iteration {iteration}:", key=generate_widget_key(user_input, iteration))
+        user_input_value = user_input  # Store the current user input value for generating the key
         if st.button(f"Send - Iteration {iteration}"):
             # Generate chatbot response using current chat history
-            response = get_chatbot_response(user_input, chat_history)
+            response = get_chatbot_response(user_input_value, chat_history)
 
             # Display chatbot response
             st.text(response)
 
             # Update chat history for the next iteration
-            chat_history += " " + user_input
+            chat_history += " " + user_input_value
             chat_history += " " + response[len("Chatbot says: "):]
 
             iteration += 1
@@ -81,4 +82,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
