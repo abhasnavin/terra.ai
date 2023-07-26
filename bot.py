@@ -15,20 +15,19 @@ def load_files_from_local(folder_path):
 
 
 # Function to process user input based on loaded file contents and generate the chatbot response
+# Function to process user input based on loaded file contents and generate the chatbot response
 def get_chatbot_response(user_input, file_contents):
-    # Chatbot logic to interpret user input based on file contents
-    response = ""
+    # Concatenate all file contents into a single string for context
+    context = " ".join(file_contents.values())
 
-    # Check if the user's input matches any keywords in the file contents
-    for file_name, content in file_contents.items():
-        if user_input.lower() in content.lower():
-            response += f"Found in {file_name}: {content}\n"
+    # Use the OpenAI API to generate the chatbot response
+    response = openai.Completion.create(
+        engine="text-davinci-002",  # Choose the appropriate GPT-3 engine
+        prompt=context + " " + user_input,
+        max_tokens=4000
+    )
 
-    # If no keyword match found, provide a default response
-    if not response:
-        response = "Chatbot says: I couldn't find any relevant information."
-
-    return response
+    return "Chatbot says: " + response['choices'][0]['text'].strip()
 
 
 def main():
