@@ -1,17 +1,9 @@
 import streamlit as st
 import os
 import openai
+import time
 
 openai.api_key = "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"
-repo_name = "https://github.com/rahulgoyal01/terra.ai"
-
-# Set the model to use for generating responses
-model = "gpt-3.5-turbo"
-import streamlit as st
-import os
-import openai
-
-openai.api_key = "YOUR_OPENAI_API_KEY"
 repo_name = "https://github.com/rahulgoyal01/terra.ai"
 
 # Set the model to use for generating responses
@@ -30,13 +22,23 @@ def load_files_from_local(folder_path):
     return file_contents
 
 
+# Function to generate a unique key based on the user input and iteration count
+def generate_widget_key(user_input, iteration):
+    return f"{user_input}__{iteration}"
+
+
 # Function to process user input based on loaded file contents and generate the chatbot response
 def get_chatbot_response(user_input, chat_history):
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": "You are a chatbot."},
+            {"role": "system", 
+            "content": "You are a Terraform Developer.  \
+                        You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                        You will use this code as an input to generate module blocks for the resources to deploy. \
+                        Just reply with the module block code only and nothing else.\
+                        The output module block must have correct value like variable names and default values"},
             {"role": "user", "content": chat_history + " " + user_input},
         ],
     )
@@ -57,9 +59,13 @@ def main():
     chat_history = "You are a chatbot."
     chat_history += " ".join(file_contents.values())
 
+    iteration = 0
+
+    user_input = ""  # Initialize user_input outside the loop
+
     while True:
-        user_input = st.text_input("You:")
-        if st.button("Send"):
+        user_input = st.text_area(f"User Input - Iteration {iteration}:", key=generate_widget_key(user_input, iteration))
+        if st.button(f"Send - Iteration {iteration}"):
             # Generate chatbot response using current chat history
             response = get_chatbot_response(user_input, chat_history)
 
@@ -70,6 +76,9 @@ def main():
             chat_history += " " + user_input
             chat_history += " " + response[len("Chatbot says: "):]
 
+            iteration += 1
+
 
 if __name__ == "__main__":
     main()
+    
