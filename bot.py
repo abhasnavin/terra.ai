@@ -1,5 +1,16 @@
 import streamlit as st
 import os
+import time
+import git
+import datetime
+import openai
+import re
+
+openai.api_key = "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"
+repo_name ='https://github.com/rahulgoyal01/terra.ai'
+
+# Set the model to use for generating responses
+model = "gpt-3.5-turbo"
 
 
 # Function to read files from the local folder and store their content in a dictionary
@@ -10,6 +21,9 @@ def load_files_from_local(folder_path):
             file_path = os.path.join(folder_path, file_name)
             with open(file_path, 'r') as file:
                 file_contents[file_name] = file.read()
+    
+    # print(file_contents)
+    # print("+++++==================+++++")
 
     return file_contents
 
@@ -22,7 +36,7 @@ def get_chatbot_response(user_input, file_contents):
 
     # Use the OpenAI API to generate the chatbot response
     response = openai.Completion.create(
-        engine="text-davinci-002",  # Choose the appropriate GPT-3 engine
+        model=model,  # Choose the appropri ate GPT-3 engine
         prompt=context + " " + user_input,
         max_tokens=4000
     )
