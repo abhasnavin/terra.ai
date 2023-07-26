@@ -7,6 +7,15 @@ repo_name = "https://github.com/rahulgoyal01/terra.ai"
 
 # Set the model to use for generating responses
 model = "gpt-3.5-turbo"
+import streamlit as st
+import os
+import openai
+
+openai.api_key = "YOUR_OPENAI_API_KEY"
+repo_name = "https://github.com/rahulgoyal01/terra.ai"
+
+# Set the model to use for generating responses
+model = "gpt-3.5-turbo"
 
 
 # Function to read files from the local folder and store their content in a dictionary
@@ -22,24 +31,17 @@ def load_files_from_local(folder_path):
 
 
 # Function to process user input based on loaded file contents and generate the chatbot response
-def get_chatbot_response(user_input, file_contents):
-    # Concatenate all file contents into a single string for context
-    context = " ".join(file_contents.values())
-
+def get_chatbot_response(user_input, chat_history):
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", "content": "You are a Terraform Developer.  \
-                                          You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
-                                          You will use this code as an input to generate module blocks for the resources to deploy. \
-                                          Just reply with the module block code only and nothing else.\
-                                          The output module block must have correct value like variable names and default values"},
-            {"role": "user", "content": context + " " + user_input},
+            {"role": "system", "content": "You are a chatbot."},
+            {"role": "user", "content": chat_history + " " + user_input},
         ],
     )
 
-    return "Chatbot says: \n"+ response['choices'][0]['message']['content'].strip()
+    return "Chatbot says: " + response['choices'][0]['message']['content'].strip()
 
 
 def main():
@@ -51,10 +53,22 @@ def main():
 
     st.title("Chatbot")
 
-    user_input = st.text_input("You:")
-    if st.button("Send"):
-        response = get_chatbot_response(user_input, file_contents)
-        st.text(response)
+    # Initial chat history with system message and file contents
+    chat_history = "You are a chatbot."
+    chat_history += " ".join(file_contents.values())
+
+    while True:
+        user_input = st.text_input("You:")
+        if st.button("Send"):
+            # Generate chatbot response using current chat history
+            response = get_chatbot_response(user_input, chat_history)
+
+            # Display chatbot response
+            st.text(response)
+
+            # Update chat history for the next iteration
+            chat_history += " " + user_input
+            chat_history += " " + response[len("Chatbot says: "):]
 
 
 if __name__ == "__main__":
