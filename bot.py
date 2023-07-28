@@ -22,28 +22,23 @@ def load_files_from_local(folder_path):
     return file_contents
 
 
-# Function to generate a unique key based on the user input and iteration count
-def generate_widget_key(user_input, iteration):
-    return f"{user_input}__{iteration}"
-
-
 # Function to process user input based on loaded file contents and generate the chatbot response
 def get_chatbot_response(user_input, chat_history):
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
         messages=[
-            {"role": "system", 
-            "content": "You are a Terraform Developer.  \
-                        You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
-                        You will use this code as an input to generate module blocks for the resources to deploy. \
-                        Just reply with the module block code only and nothing else.\
-                        The output module block must have correct value like variable names and default values"},
+            {"role": "system", "content": "You are a chatbot."},
             {"role": "user", "content": chat_history + " " + user_input},
         ],
     )
 
     return "Chatbot says: " + response['choices'][0]['message']['content'].strip()
+
+
+# Function to generate a unique key based on the user input and iteration count
+def generate_widget_key(user_input, iteration, widget_type):
+    return f"{user_input}_{iteration}_{widget_type}"
 
 
 def main():
@@ -56,7 +51,12 @@ def main():
     st.title("Chatbot")
 
     # Initial chat history with system message and file contents
-    chat_history = "You are a chatbot."
+    chat_history = "You are a Terraform Developer.  \
+                    You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                    You will use this code as an input to generate module blocks for the resources to deploy. \
+                    Just reply with the module block code only and nothing else.\
+                    The output module block must have correct value like variable names and default values."
+
     chat_history += " ".join(file_contents.values())
 
     iteration = 0
@@ -64,9 +64,11 @@ def main():
     user_input = ""  # Initialize user_input outside the loop
 
     while True:
-        user_input = st.text_area(f"User Input - Iteration {iteration}:", key=generate_widget_key(user_input, iteration))
+        user_input = st.text_area(  # noqa: E501
+            f"User Input - Iteration {iteration}:", key=generate_widget_key(user_input, iteration, "text_area")
+        )
         user_input_value = user_input  # Store the current user input value for generating the key
-        if st.button(f"Send - Iteration {iteration}"):
+        if st.button(f"Send - Iteration {iteration}", key=generate_widget_key("button", iteration, "button")):
             # Generate chatbot response using current chat history
             response = get_chatbot_response(user_input_value, chat_history)
 
