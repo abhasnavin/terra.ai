@@ -35,6 +35,11 @@ variable "s3_bucket_force_destroy" {
   default     = null
 }
 
+variable "s3_bucket_prefix" {
+  description = "Creates a unique bucket name beginning with the specified prefix. Conflicts with s3_bucket_name."
+  default     = null
+}
+
 variable "s3_bucket_object_lock_enabled" {
   description = "(Optional, Default:false, Forces new resource) Indicates whether this bucket has an Object Lock configuration enabled."
   default     = null
