@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import openai
-import time
 
 openai.api_key = "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"
 repo_name = "https://github.com/rahulgoyal01/terra.ai"
@@ -23,28 +22,26 @@ def load_files_from_local(folder_path):
 
 
 # Function to process user input based on loaded file contents and generate the chatbot response
-def get_chatbot_response(user_input, chat_history):
+def get_chatbot_response(user_input, file_contents):
+    # Concatenate all file contents into a single string for context
+    context = " ".join(file_contents.values())
+
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
-        temperature=0.01,
+        temperature = 0.01,
         messages=[
-            {"role": "system",
-            "content": "You are a Terraform Developer.  \
-                        You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
-                        You will use this code as an input to generate module blocks for the resources to deploy. \
-                        Just reply with the module block code only and nothing else.\
-                        The output module block must have correct value like variable names and default values."},
-            {"role": "user", "content": chat_history + " " + user_input},
+            {"role": "system", "content": "You are a Terraform Developer.  \
+                                          You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                                          You will use this code as an input to generate module blocks for the resources to deploy. \
+                                          Just reply with the module block code only and nothing else.\
+                                          The output module block must have correct value like variable names and default values. \
+                                          The value of a variable in a module block should not be a variable. Assume default values for them."},
+            {"role": "user", "content": context + " " + user_input},
         ],
     )
 
-    return "Chatbot says: " + response['choices'][0]['message']['content'].strip()
-
-
-# Function to generate a unique key based on the user input and iteration count
-def generate_widget_key(user_input, iteration, widget_type):
-    return f"{user_input}_{iteration}_{widget_type}"
+    return "#Chatbot says: \n"+ response['choices'][0]['message']['content'].strip()
 
 
 def main():
@@ -54,42 +51,12 @@ def main():
     # Load files from local folder
     file_contents = load_files_from_local(folder_path)
 
-    st.title("TerraBot")
+    st.title("Chatbot")
 
-    # Initial chat history with system message and file contents
-    chat_history = "You are a Terraform Developer.  \
-                    You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
-                    You will use this code as an input to generate module blocks for the resources to deploy. \
-                    Just reply with the module block code only and nothing else.\
-                    The output module block must have correct value like variable names and default values."
-
-    chat_history += " ".join(file_contents.values())
-
-    user_input = st.text_input("User Input", value="", key="user_input_1")
-
-    def button_handler():
-        # Define chat history inside the function
-        chat_history = "You are a Terraform Developer.  \
-                    You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
-                    You will use this code as an input to generate module blocks for the resources to deploy. \
-                    Just reply with the module block code only and nothing else.\
-                    The output module block must have correct value like variable names and default values."
-
-        # Get user input
-        user_input = st.text_input("User Input", value="", key="user_input_2")
-
-        # Generate chatbot response using current chat history
-        response = get_chatbot_response(user_input, chat_history)
-
-        # Display chatbot response
+    user_input = st.text_input("You:")
+    if st.button("Send"):
+        response = get_chatbot_response(user_input, file_contents)
         st.text(response)
-
-        # Update chat history for the next iteration
-        chat_history += " " + user_input
-        chat_history += " " + response[len("Chatbot says: "):]
-
-    if st.button("Send", key="button_1"):
-        button_handler()
 
 
 if __name__ == "__main__":
