@@ -8,7 +8,6 @@ repo_name = "https://github.com/rahulgoyal01/terra.ai"
 # Set the model to use for generating responses
 model = "gpt-3.5-turbo"
 
-
 # Function to read files from the local folder and store their content in a dictionary
 def load_files_from_local(folder_path):
     file_contents = {}
@@ -29,7 +28,7 @@ def get_chatbot_response(user_input, file_contents):
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
-        temperature = 0.01,
+        temperature=0.01,
         messages=[
             {"role": "system", "content": "You are a Terraform Developer.  \
                                           You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
@@ -41,7 +40,23 @@ def get_chatbot_response(user_input, file_contents):
         ],
     )
 
-    return "#Chatbot says: \n"+ response['choices'][0]['message']['content'].strip()
+    return "#Chatbot says: \n" + response['choices'][0]['message']['content'].strip()
+
+
+# Function to write the chatbot response to the /env/dev/s3.tf file
+def write_to_file(response):
+    file_path = './env/dev/s3.tf'
+    with open(file_path, 'w') as file:
+        file.write(response)
+
+
+# Function to commit and push changes to the GitHub repository
+def commit_and_push_changes():
+    repo = git.Repo(".")
+    repo.git.add(update=True)
+    repo.index.commit("ChatGPT response updated")
+    origin = repo.remote(name="origin")
+    origin.push()
 
 
 def main():
@@ -53,10 +68,15 @@ def main():
 
     st.title("Chatbot")
 
-    user_input = st.text_input("You:")
+    user_input = st.text_area("You:")
     if st.button("Send"):
         response = get_chatbot_response(user_input, file_contents)
         st.text(response)
+
+    if st.button("Deploy"):
+        write_to_file(response)
+        commit_and_push_changes()
+        st.text("Changes committed and pushed to GitHub!")
 
 
 if __name__ == "__main__":
