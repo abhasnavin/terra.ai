@@ -27,8 +27,14 @@ def get_chatbot_response(user_input, chat_history):
     # Use the OpenAI API to generate the chatbot response
     response = openai.ChatCompletion.create(
         model=model,
+        temperature=0.01,
         messages=[
-            {"role": "system", "content": "You are a chatbot."},
+            {"role": "system",
+            "content": "You are a Terraform Developer.  \
+                        You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                        You will use this code as an input to generate module blocks for the resources to deploy. \
+                        Just reply with the module block code only and nothing else.\
+                        The output module block must have correct value like variable names and default values."},
             {"role": "user", "content": chat_history + " " + user_input},
         ],
     )
@@ -48,7 +54,7 @@ def main():
     # Load files from local folder
     file_contents = load_files_from_local(folder_path)
 
-    st.title("Chatbot")
+    st.title("TerraBot")
 
     # Initial chat history with system message and file contents
     chat_history = "You are a Terraform Developer.  \
@@ -59,27 +65,31 @@ def main():
 
     chat_history += " ".join(file_contents.values())
 
-    iteration = 0
+    user_input = st.text_input("User Input", value="", key="user_input_1")
 
-    user_input = ""  # Initialize user_input outside the loop
+    def button_handler():
+        # Define chat history inside the function
+        chat_history = "You are a Terraform Developer.  \
+                    You will be using files and data that holds resource blocks, variable blocks and output blocks for terraform code. \
+                    You will use this code as an input to generate module blocks for the resources to deploy. \
+                    Just reply with the module block code only and nothing else.\
+                    The output module block must have correct value like variable names and default values."
 
-    while True:
-        user_input = st.text_area(  # noqa: E501
-            f"User Input - Iteration {iteration}:", key=generate_widget_key(user_input, iteration, "text_area")
-        )
-        user_input_value = user_input  # Store the current user input value for generating the key
-        if st.button(f"Send - Iteration {iteration}", key=generate_widget_key("button", iteration, "button")):
-            # Generate chatbot response using current chat history
-            response = get_chatbot_response(user_input_value, chat_history)
+        # Get user input
+        user_input = st.text_input("User Input", value="", key="user_input_2")
 
-            # Display chatbot response
-            st.text(response)
+        # Generate chatbot response using current chat history
+        response = get_chatbot_response(user_input, chat_history)
 
-            # Update chat history for the next iteration
-            chat_history += " " + user_input_value
-            chat_history += " " + response[len("Chatbot says: "):]
+        # Display chatbot response
+        st.text(response)
 
-            iteration += 1
+        # Update chat history for the next iteration
+        chat_history += " " + user_input
+        chat_history += " " + response[len("Chatbot says: "):]
+
+    if st.button("Send", key="button_1"):
+        button_handler()
 
 
 if __name__ == "__main__":
