@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import openai
+import git
 
 openai.api_key = "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"
 repo_name = "https://github.com/rahulgoyal01/terra.ai"
@@ -69,14 +70,24 @@ def main():
     st.title("Chatbot")
 
     user_input = st.text_area("You:")
+
+    # Initialize response as an empty string
+    if 'response' not in st.session_state:
+        st.session_state.response = ""
+
     if st.button("Send"):
-        response = get_chatbot_response(user_input, file_contents)
-        st.text(response)
+        # Update the response variable with the generated chatbot response
+        st.session_state.response = get_chatbot_response(user_input, file_contents)
+        st.text(st.session_state.response)
 
     if st.button("Deploy"):
-        write_to_file(response)
-        commit_and_push_changes()
-        st.text("Changes committed and pushed to GitHub!")
+        # Check if a response exists before deploying
+        if st.session_state.response:
+            write_to_file(st.session_state.response)
+            commit_and_push_changes()
+            st.text("Changes committed and pushed to GitHub!")
+        else:
+            st.text("Please generate a chatbot response before deploying!")
 
 
 if __name__ == "__main__":
