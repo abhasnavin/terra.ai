@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import openai
 import git
+import requests
 
 openai.api_key = "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"
 github_token = "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"  # Replace with your GitHub token
