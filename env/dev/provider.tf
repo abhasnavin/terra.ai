@@ -1,19 +1,21 @@
 terraform {
-  required_version = ">= 1.3.5" # Specify the minimum required Terraform version
+  required_version = ">= 1.3.5"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = ">= 3.0, < 4.0"
     }
   }
-  #  backend "remote" {
-  #    hostname     = "app.terraform.io"
-  #    organization = "terraAI"
-  #    workspaces { name = "ai-dev" }
-  #  }
 }
 
 provider "aws" {
-  region = "us-west-2" # Update with your desired AWS region
-  # Add any other provider configurations if needed
+  region = "ap-southeast-2"
+}
+
+terraform {
+  backend "s3" {
+    key    = "terraform.tfstate"
+    bucket = "glue-terraform-backend"
+    region = "ap-southeast-2"
+  }
 }
