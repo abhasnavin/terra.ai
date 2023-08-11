@@ -4,7 +4,9 @@ import openai
 import git
 
 openai.api_key = "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"
+github_token = "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"  # Replace with your GitHub token
 repo_name = "https://github.com/rahulgoyal01/terra.ai"
+workflow_id = "terraform-dev.yml"  # Replace with your GitHub Actions workflow ID
 
 # Set the model to use for generating responses
 model = "gpt-3.5-turbo"
@@ -59,6 +61,19 @@ def commit_and_push_changes():
     origin = repo.remote(name="origin")
     origin.push()
 
+def get_workflow_status(repo_name, workflow_id):
+    headers = {
+        "Authorization": f"Bearer {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    url = f"https://api.github.com/repos/{repo_name}/actions/workflows/{workflow_id}/runs"
+    response = requests.get(url, headers=headers)
+    data = response.json()
+    if data and "workflow_runs" in data:
+        latest_run = data["workflow_runs"][0]
+        return latest_run["conclusion"]
+    return None
+
 
 def main():
     # Local folder path
@@ -75,7 +90,7 @@ def main():
     if 'response' not in st.session_state:
         st.session_state.response = ""
 
-    if st.button("Send"):
+    if st.button("Plan"):
         # Update the response variable with the generated chatbot response
         st.session_state.response = get_chatbot_response(user_input, file_contents)
         st.text(st.session_state.response)
@@ -85,10 +100,16 @@ def main():
         if st.session_state.response:
             write_to_file(st.session_state.response)
             commit_and_push_changes()
-            st.text("Changes committed and pushed to GitHub!")
+            workflow_status = get_workflow_status(repo_name, workflow_id)
+
+            if workflow_status == "success":
+                chatbot_response = "The GitHub workflow has passed! You can proceed with deployment."
+            else:
+                chatbot_response = "The GitHub workflow has failed. Please check the logs for more information."
+
+            st.text(chatbot_response)
         else:
             st.text("Please generate a chatbot response before deploying!")
-
 
 if __name__ == "__main__":
     main()
