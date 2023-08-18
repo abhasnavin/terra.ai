@@ -5,7 +5,7 @@ import git
 import requests
 
 openai.api_key = "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"
-github_token = "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"  # Replace with your GitHub token
+github_token = "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"  # Replace with your GitHub token
 repo_name = "https://github.com/rahulgoyal01/terra.ai"
 workflow_id = "terraform-dev.yml"  # Replace with your GitHub Actions workflow ID
 
