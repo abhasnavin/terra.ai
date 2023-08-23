@@ -2,13 +2,8 @@ import streamlit as st
 import os
 import openai
 import git
-import time
-import requests
-
-openai.api_key = "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"
-github_token = "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"  # Replace with your GitHub token
-repo_name = "https://github.com/rahulgoyal01/terra.ai"
-workflow_id = "terraform-dev.yml"  # Replace with your GitHub Actions workflow ID
+from github_helpers import get_workflow_status
+from config import repo_name, github_token, workflow_id
 
 # Set the model to use for generating responses
 model = "gpt-3.5-turbo"
@@ -62,35 +57,6 @@ def commit_and_push_changes():
     repo.index.commit("ChatGPT response updated")
     origin = repo.remote(name="origin")
     origin.push()
-
-def get_workflow_status(repo_name, workflow_id, github_token):
-    headers = {
-        "Authorization": f"Bearer {github_token}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-    url = f"https://api.github.com/repos/{repo_name}/actions/workflows/{workflow_id}/runs"
-    
-    # Maximum number of checks before considering it a failure
-    max_checks = 30
-    check_interval = 60  # Check every 60 seconds
-    
-    for _ in range(max_checks):
-        response = requests.get(url, headers=headers)
-        data = response.json()
-
-        if "workflow_runs" in data:
-            # Check status of the latest run
-            latest_run = data["workflow_runs"][0]
-            status = latest_run["conclusion"]
-            if status == "success":
-                return "success"
-            elif status == "failure":
-                return "failure"
-
-        # Wait before checking again
-        time.sleep(check_interval)
-
-    return None
 
 def main():
     # Local folder path
