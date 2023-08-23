@@ -117,7 +117,7 @@ def main():
         if st.session_state.response:
             write_to_file(st.session_state.response)
             commit_and_push_changes()
-            workflow_status = get_workflow_status(repo_name, workflow_id)
+            workflow_status = get_workflow_status(repo_name, workflow_id, github_token)
 
             if workflow_status == "success":
                 chatbot_response = "The GitHub workflow has passed! You can proceed with deployment."
