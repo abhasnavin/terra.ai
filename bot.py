@@ -117,6 +117,10 @@ def main():
         if st.session_state.response:
             write_to_file(st.session_state.response)
             commit_and_push_changes()
+            
+            # Display a placeholder for the status message
+            status_placeholder = st.empty()
+            
             workflow_status = get_workflow_status(repo_name, workflow_id, github_token)
 
             if workflow_status == "success":
@@ -124,7 +128,8 @@ def main():
             else:
                 chatbot_response = "The GitHub workflow has failed. Please check the logs for more information."
 
-            st.text(chatbot_response)
+            # Update the status message
+            status_placeholder.text(chatbot_response)
         else:
             st.text("Please generate a chatbot response before deploying!")
 
