@@ -40,3 +40,4 @@ terraform.rc
 /.idea/terra.ai.iml
 /.idea/vcs.xml
 /env/dev/.terraform.lock.hcl
+/bot_1.py
