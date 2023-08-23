@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import openai
 import git
-from github_helpers import get_workflow_status
+from github_helpers import get_workflow_status, raise_pull_request
 from config import repo_name, github_token, workflow_id
 
 # Set the model to use for generating responses
@@ -91,6 +91,12 @@ def main():
 
             if workflow_status == "success":
                 chatbot_response = "The GitHub workflow has passed! You can proceed with deployment."
+
+                # Show the "Raise Pull Request" button when the workflow status is successful
+                if st.button("Raise Pull Request"):
+                    # Code to raise a pull request here
+                    pull_request_response = raise_pull_request(repo_name, github_token)
+                    st.text(pull_request_response)
             else:
                 chatbot_response = "The GitHub workflow has failed. Please check the logs for more information."
 
