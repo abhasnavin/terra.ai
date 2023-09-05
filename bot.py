@@ -70,6 +70,11 @@ def main():
     if 'response' not in st.session_state:
         st.session_state.response = ""
 
+    # Initialize commit_message as an empty string
+    commit_message = ""
+    if 'commit_message' not in st.session_state:
+        st.session_state.commit_message = ""
+
     if st.button("Plan"):
         # Update the response variable with the generated chatbot response
         st.session_state.response = get_chatbot_response(user_input, file_contents)
@@ -77,14 +82,17 @@ def main():
 
     if st.button("Add Commit Message"):
         # Get the commit message from the user and store it in session state
-        st.session_state.commit_message = st.text_input("Enter a commit message:")
+        if st.session_state.response:
+            write_to_file(st.session_state.response)
+        
+        commit_message = st.text_area("Enter a commit message:")
+        st.session_state.commit_message = commit_message
 
     if st.button("Deploy"):
-        # Check if a response exists and if a commit message has been entered
-        if st.session_state.response and 'commit_message' in st.session_state:
-            write_to_file(st.session_state.response)
-            commit_message = st.session_state.commit_message
-            commit_and_push_changes(commit_message)
+        # Check if a commit message has been entered
+        if st.session_state.response:  # Use the commit_message declared at the beginning
+            commit_message = st.session_state.commit_message 
+            commit_and_push_changes(commit_message)  # Pass commit_message here
             
             # Display a placeholder for the status message
             status_placeholder = st.empty()
