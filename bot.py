@@ -85,13 +85,12 @@ def main():
         if st.session_state.response:
             write_to_file(st.session_state.response)
         
-        commit_message = st.text_area("Enter a commit message:")
-        st.session_state.commit_message = commit_message
+        st.session_state.commit_message = st.text_area("Enter a commit message:")
+        commit_message = st.session_state.commit_message
 
     if st.button("Deploy"):
         # Check if a commit message has been entered
         if st.session_state.response:  # Use the commit_message declared at the beginning
-            commit_message = st.session_state.commit_message 
             commit_and_push_changes(commit_message)  # Pass commit_message here
             
             # Display a placeholder for the status message

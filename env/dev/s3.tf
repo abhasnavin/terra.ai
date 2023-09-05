@@ -3,7 +3,7 @@ module "s3_bucket" {
   source = "../../modules/s3"
 
   enable_s3_bucket = true
-  s3_bucket_name = "rahul-private-s3-bucket"
+  s3_bucket_name = "sony-private-s3-bucket"
   s3_bucket_force_destroy = null
   s3_bucket_prefix = null
   s3_bucket_object_lock_enabled = null
