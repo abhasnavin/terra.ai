@@ -51,7 +51,8 @@ def write_to_file(response):
 def commit_and_push_changes(commit_message):
     repo = git.Repo(".")
     repo.git.add(update=True)
-    repo.index.commit(commit_message)  # Use the provided commit message
+    message = commit_message
+    repo.index.commit(message)  # Use the provided commit message
     origin = repo.remote(name="origin")
     origin.push()
 
