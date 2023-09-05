@@ -85,8 +85,7 @@ def main():
         if st.session_state.response:
             write_to_file(st.session_state.response)
         
-        st.session_state.commit_message = st.text_area("Enter a commit message:")
-        commit_message = st.session_state.commit_message
+        commit_message = st.text_area("Enter a commit message:")
 
     if st.button("Deploy"):
         # Check if a commit message has been entered
