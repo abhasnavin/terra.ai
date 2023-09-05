@@ -76,7 +76,7 @@ def main():
         st.text(st.session_state.response)
 
     if st.button("Add Commit Message"):
-        # Get the commit message from the user
+        # Get the commit message from the user and store it in session state
         st.session_state.commit_message = st.text_input("Enter a commit message:")
 
     if st.button("Deploy"):
