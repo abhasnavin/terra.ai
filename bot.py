@@ -19,7 +19,6 @@ def load_files_from_local(folder_path):
 
     return file_contents
 
-
 # Function to process user input based on loaded file contents and generate the chatbot response
 def get_chatbot_response(user_input, file_contents):
     # Concatenate all file contents into a single string for context
@@ -42,19 +41,17 @@ def get_chatbot_response(user_input, file_contents):
 
     return "#Chatbot says: \n" + response['choices'][0]['message']['content'].strip()
 
-
 # Function to write the chatbot response to the /env/dev/s3.tf file
 def write_to_file(response):
     file_path = './env/dev/s3.tf'
     with open(file_path, 'w') as file:
         file.write(response)
 
-
 # Function to commit and push changes to the GitHub repository
-def commit_and_push_changes():
+def commit_and_push_changes(commit_message):
     repo = git.Repo(".")
     repo.git.add(update=True)
-    repo.index.commit("ChatGPT response updated")
+    repo.index.commit(commit_message)  # Use the provided commit message
     origin = repo.remote(name="origin")
     origin.push()
 
@@ -78,11 +75,16 @@ def main():
         st.session_state.response = get_chatbot_response(user_input, file_contents)
         st.text(st.session_state.response)
 
+    if st.button("Add Commit Message"):
+        # Get the commit message from the user
+        st.session_state.commit_message = st.text_input("Enter a commit message:")
+
     if st.button("Deploy"):
-        # Check if a response exists before deploying
-        if st.session_state.response:
+        # Check if a response exists and if a commit message has been entered
+        if st.session_state.response and 'commit_message' in st.session_state:
             write_to_file(st.session_state.response)
-            commit_and_push_changes()
+            commit_message = st.session_state.commit_message
+            commit_and_push_changes(commit_message)
             
             # Display a placeholder for the status message
             status_placeholder = st.empty()
@@ -103,7 +105,7 @@ def main():
             # Update the status message
             status_placeholder.text(chatbot_response)
         else:
-            st.text("Please generate a chatbot response before deploying!")
+            st.text("Please generate a chatbot response and enter a commit message before deploying!")
 
 if __name__ == "__main__":
     main()
