@@ -1,9 +1,17 @@
 from github import Github
 from github import Auth
 import time
+import logging
 
 # Constants
 CHECK_INTERVAL = 60
+
+# Initialize the logging configuration
+logging.basicConfig(
+    filename='helper_script_log.log',  # Specify the log file name
+    level=logging.DEBUG,  # Set the log level (INFO, DEBUG, etc.)
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Define the log format
+)
 
 def get_workflow_status(repo_name, workflow_id, github_token):
     auth = Auth.Token(github_token)
