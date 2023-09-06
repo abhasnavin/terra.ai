@@ -1,7 +1,6 @@
 from github import Github
 from github import Auth
 import time
-import logging
 
 # Constants
 CHECK_INTERVAL = 60
