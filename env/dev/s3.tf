@@ -3,7 +3,7 @@ module "s3_bucket" {
   source = "../../modules/s3"
 
   enable_s3_bucket = true
-  s3_bucket_name = "foo-private-s3-bucket"
+  s3_bucket_name = "koo-private-s3-bucket"
   s3_bucket_force_destroy = null
   s3_bucket_prefix = null
   s3_bucket_object_lock_enabled = null
