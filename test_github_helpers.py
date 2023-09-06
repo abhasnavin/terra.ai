@@ -10,6 +10,7 @@ def test_get_workflow_status():
     else:
         print("Unable to determine workflow status.")
 
+
 def test_raise_pull_request():
     result = raise_pull_request(repo_name, github_token)
     if result.startswith("Pull request created successfully! URL:"):
