@@ -6,12 +6,12 @@ import logging
 # Constants
 CHECK_INTERVAL = 60
 
-# Initialize the logging configuration
-logging.basicConfig(
-    filename='helper_script_log.log',  # Specify the log file name
-    level=logging.DEBUG,  # Set the log level (INFO, DEBUG, etc.)
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Define the log format
-)
+# # Initialize the logging configuration
+# logging.basicConfig(
+#     filename='helper_script_log.log',  # Specify the log file name
+#     level=logging.DEBUG,  # Set the log level (INFO, DEBUG, etc.)
+#     format='%(asctime)s - %(levelname)s - %(message)s',  # Define the log format
+# )
 
 def get_workflow_status(repo_name, workflow_id, github_token):
     auth = Auth.Token(github_token)
@@ -62,14 +62,18 @@ def raise_pull_request(repo_name, github_token):
     repo = g.get_user().get_repo(repo_name)
     
     default_branch = repo.default_branch
+    print(default_branch)
     
     most_recent_branch = get_most_recently_pushed_branch(repo)
+    print(most_recent_branch)
     
     if most_recent_branch:
         head_branch_name = most_recent_branch.name
         head = f"{repo.owner.login}:{head_branch_name}"  # Format it as "owner:branch"
+        print(head)
         title = "Feature Branch Pull Request"
         body = f"This is a pull request from the {head_branch_name} branch."
+        print(body)
         
         try:
             pull_request = repo.create_pull(title=title, body=body, base=default_branch, head=head)
