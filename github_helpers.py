@@ -81,3 +81,17 @@ def raise_pull_request(repo_name, github_token):
             return f"Error creating pull request: {str(e)}"
     else:
         return "No branches found."
+
+def approve_latest_pull_request(github_token, repo_name):
+    # Initialize PyGithub with your token
+    g = Github(github_token)
+
+    # Get the repository
+    repo = g.get_repo(repo_name)
+
+    # Get the latest pull request
+    pull_requests = repo.get_pulls()
+    latest_pull_request = next(pull_requests)
+
+    # Approve the pull request
+    latest_pull_request.create_review(event="APPROVE")
