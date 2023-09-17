@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import openai
 import git
-from github_helpers import get_workflow_status, raise_pull_request
+from github_helpers import get_workflow_status, raise_pull_request, approve_latest_pull_request
 from config import repo_name, github_token, workflow_id
 
 # Set the model to use for generating responses
