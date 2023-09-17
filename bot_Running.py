@@ -111,7 +111,7 @@ def main():
 
     if st.button("Approve Latest Pull Request"):
         # Code to approve the latest pull request
-        approve_latest_pull_request(github_token, repo_name)
+        approve_latest_pull_request(repo_name, github_token)
         st.write("Latest pull request approved.")
 
 if __name__ == "__main__":

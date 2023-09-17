@@ -82,16 +82,28 @@ def raise_pull_request(repo_name, github_token):
     else:
         return "No branches found."
 
-def approve_latest_pull_request(github_token, repo_name):
+def approve_latest_pull_request(repo_name, github_token):
     # Initialize PyGithub with your token
-    g = Github(github_token)
+    auth = Auth.Token(github_token)
+    print("*************Here1")
+    g = Github(auth=auth)
+    print("*************Here2")
+    print(repo_name)
+    repo = g.get_user().get_repo(repo_name)
+    print("*************Here3")
 
-    # Get the repository
-    repo = g.get_repo(repo_name)
+    # Get a list of all open pull requests
+    pull_requests = repo.get_pulls(state="open")
+    try:
+        # Sort the pull requests by creation time in descending order
+        sorted_pull_requests = sorted(pull_requests, key=lambda pr: pr.created_at, reverse=True)
 
-    # Get the latest pull request
-    pull_requests = repo.get_pulls()
-    latest_pull_request = next(pull_requests)
+        # Get the latest (first) pull request in the sorted list
+        latest_pull_request = sorted_pull_requests[0]
 
-    # Approve the pull request
-    latest_pull_request.create_review(event="APPROVE")
+        # Approve the latest pull request
+        latest_pull_request.create_review(event="APPROVE")
+        return "Pull request approved successfully!"
+        
+    except Exception as e:
+        return f"Error approving pull request: {str(e)}"
