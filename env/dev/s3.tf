@@ -1,24 +1,28 @@
-module "s3_private_bucket" {
-  source      = "../../modules/s3"
+#Chatbot says: 
+module "s3_bucket" {
+  source = "../../modules/s3"
 
-  # AWS S3 bucket
   enable_s3_bucket = true
-  s3_bucket_name   = "dev-s3-bucket-rg01"
+  s3_bucket_name = "pu-private-s3-bucket"
+  s3_bucket_force_destroy = null
+  s3_bucket_prefix = null
+  s3_bucket_object_lock_enabled = null
 
-  // Enable S3 bucket ACL
   enable_s3_bucket_acl = true
-  s3_bucket_acl_acl    = "private"
+  s3_bucket_acl_bucket = ""
+  s3_bucket_acl_expected_bucket_owner = null
+  s3_bucket_acl_acl = "private"
+  s3_bucket_acl_access_control_policy = []
 
-  //enable s3 bucket ownership
   enable_s3_bucket_ownership_controls = true
-  s3_bucket_ownership_controls_rule   = [
+  s3_bucket_ownership_controls_bucket = ""
+  s3_bucket_ownership_controls_rule = [
     {
       object_ownership = "ObjectWriter"
     }
   ]
 
   tags = {
-    "Environment"   = "dev",
-    "Orchestration" = "Terraform"
+    env = "dev"
   }
 }

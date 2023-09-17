@@ -30,13 +30,13 @@ variable "s3_bucket_name" {
   default     = null
 }
 
-variable "s3_bucket_prefix" {
-  description = "Creates a unique bucket name beginning with the specified prefix. Conflicts with s3_bucket_name."
+variable "s3_bucket_force_destroy" {
+  description = "(Optional) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   default     = null
 }
 
-variable "s3_bucket_force_destroy" {
-  description = "(Optional) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
+variable "s3_bucket_prefix" {
+  description = "Creates a unique bucket name beginning with the specified prefix. Conflicts with s3_bucket_name."
   default     = null
 }
 

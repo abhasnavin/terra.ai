@@ -40,3 +40,7 @@ terraform.rc
 /.idea/terra.ai.iml
 /.idea/vcs.xml
 /env/dev/.terraform.lock.hcl
+/bot_1.py
+config.py
+__pycache__/github_helpers.cpython-311.pyc
+__pycache__/config.cpython-311.pyc
