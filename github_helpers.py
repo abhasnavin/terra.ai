@@ -102,8 +102,8 @@ def approve_latest_pull_request(repo_name, github_token):
         latest_pull_request = sorted_pull_requests[0]
 
         # Approve the latest pull request
-        latest_pull_request.create_review(event="APPROVE")
-        return "Pull request approved successfully!"
+        response = latest_pull_request.create_review(event="APPROVE")
+        return response
         
     except Exception as e:
         return f"Error approving pull request: {str(e)}"
