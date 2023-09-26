@@ -109,10 +109,10 @@ def main():
         pull_request_response = raise_pull_request(repo_name, github_token)
         st.write(pull_request_response)
 
-    if st.button("Approve Latest Pull Request"):
-        # Code to approve the latest pull request
-        response = approve_latest_pull_request(repo_name, github_token)
-        st.write(response)
+    # if st.button("Approve Latest Pull Request"):
+    #     # Code to approve the latest pull request
+    #     response = approve_latest_pull_request(repo_name, github_token)
+    #     st.write(response)
 
 if __name__ == "__main__":
     main()
