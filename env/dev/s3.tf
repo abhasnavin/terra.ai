@@ -1,5 +1,5 @@
 #Chatbot says: 
-module "s3_bucket" {
+module "s3_bucket_private" {
   source = "../../modules/s3"
 
   enable_s3_bucket = true
