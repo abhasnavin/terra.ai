@@ -3,7 +3,7 @@ module "s3_bucket" {
   source = "../../modules/s3"
 
   enable_s3_bucket = true
-  s3_bucket_name = "new2-private-s3-bucket"
+  s3_bucket_name = "private-s3-bucket"
   s3_bucket_force_destroy = null
   s3_bucket_prefix = null
   s3_bucket_object_lock_enabled = null
@@ -23,6 +23,6 @@ module "s3_bucket" {
   ]
 
   tags = {
-    env = "test"
+    env = "dev"
   }
 }

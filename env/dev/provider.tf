@@ -15,7 +15,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     key    = "terraform.tfstate"
-    bucket = "glue-terraform-backend"
-    region = "ap-southeast-2"
+    bucket = "terrabot-backend"
+    region = "us-east-1"
   }
 }
